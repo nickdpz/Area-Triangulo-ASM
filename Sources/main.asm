@@ -7,9 +7,7 @@
 INTACC1     DS    4            ;32-bit integer accumulator #1
 INTACC2     DS    4  
 AUX	DS 5
-M1 	DS 2
-M2 	DS 2
-M3 	DS 2
+M 	DS 6
 S	DS 2
 CONTADOR DS 1
 ;Desactivar WatchDog Timer Evita que el microcontrolador se reinicie
@@ -21,39 +19,26 @@ INICIO: CLRA;Limpia registro A
 		TXS; SP = 4AFH o  (HX - 1) -> SP
 OPERACIONES:
 		LDHX	#0H				;Se le asigna la posicion de la tabla que quiere leer 
-		LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
+CARGA:	LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
 		PSHA					;Se carga dato a la pila								
 		AND 	#0FH			;Se emascara la parte baja del dato
-		STA 	M1+0			;Se carga el dato En M+1 Parte mas baja entera			
+		STA 	M,X			;Se carga el dato En M+1 Parte mas baja entera			
 		PULA					;Se saca dato de la pila		
 		AND 	#0F0H			;Se emascara la parte alta del dato
 		LSRA					;Se desplaza a la derecha, Cuatro posiciones en total
 		LSRA					;""
 		LSRA					;""
 		LSRA					;""
+		PSHX					;
 		LDX		#0AH			;Se carga X con 10
 		MUL						;Se X*A parte baja en A y parte alta en X 
-		ADD 	M1+0				;Se suma el dato almacenado en la posicion entera mas baja con A sin bit de acarreo  
-		STA 	M1+0				;Se carga el resultado de la suma a la parte entera mas baja
-************************		
-		LDHX	#1H				;Se le asigna la posicion de la tabla que quiere leer 
-		LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
-		PSHA					;Se carga dato a la pila								
-		AND 	#0FH			;Se emascara la parte baja del dato
-		STA 	M1+1			;Se carga el dato En M+1 Parte mas baja entera			
-		PULA					;Se saca dato de la pila		
-		AND 	#0F0H			;Se emascara la parte alta del dato
-		LSRA					;Se desplaza a la derecha, Cuatro posiciones en total
-		LSRA					;""
-		LSRA					;""
-		LSRA					;""
-		LDX		#0AH			;Se carga X con 10
-		MUL						;Se X*A parte baja en A y parte alta en X 
-		ADD 	M1+1				;Se suma el dato almacenado en la posicion entera mas baja con A sin bit de acarreo  
-		STA 	M1+1				;Se carga el resultado de la suma a la parte entera mas baja		
-************************
-		
-		
+		PULX					;
+		ADD 	M,X				;Se suma el dato almacenado en la posicion entera mas baja con A sin bit de acarreo  
+		STA 	M,X				;Se carga el resultado de la suma a la parte entera mas baja
+		INCX					;Incrementa X	
+		CBEQX 	#04H,SUMAS
+		JMP 	CARGA			;
+SUMAS:  LDX		#0AH			;
 		JMP *;
 UMULT16:     EQU     *
             PSHA                        ;save acc
@@ -167,7 +152,7 @@ SHFTLP: LDA     REMAINDER               ;get remainder MSB
         ROL     REMAINDER+1             ;shift remainder LSB
         ROL     REMAINDER               ;shift remainder MSB
         
-TABLA: FCB 99H,23H,33H,44H,0A0H,0H,0FFH,11H,8BH,44H,1H,5H,7H,23H,11H,7CH,0C0H,0AAH,19H,20H,21H
-
+TABLA: FCB 99H,23H,33H,44H
+;			Aentero,Adecimal,B,C
 	ORG 0FFFEH;
 	FDB INICIO; A DONDE SE DIRIGE DESPUES DE RESET
