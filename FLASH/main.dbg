@@ -3245,9 +3245,9 @@ mPageErase:         equ     $40
 ;Dos byte mas significativos parte entera y el menos significativo parte decimal
 INTACC1     DS    4            ;32-bit integer accumulator #1
 INTACC2     DS    4  
-AUX	DS 5
-M 	DS 6
-S	DS 2
+AUX			DS 5
+M 			DS 6
+SUMA		DS 3
 CONTADOR DS 1
 ;Desactivar WatchDog Timer Evita que el microcontrolador se reinicie
 	ORG 0C000H
@@ -3256,6 +3256,14 @@ INICIO: CLRA;Limpia registro A
 		STA SOPT1;Carga registro SOPT1 con ceros para Deshabilitar Modulo COP
 		LDHX #4B0H;Carga #4B0H para reubicar la pila al final de la RAM 
 		TXS; SP = 4AFH o  (HX - 1) -> SP
+		CLR SUMA+0;
+		CLR SUMA+1;
+		CLR SUMA+2;
+		CLR AUX;
+		CLR AUX+1;
+		CLR AUX+2;
+		CLR AUX+3;
+		CLR AUX+4;
 OPERACIONES:
 		LDHX	#0H				;Se le asigna la posicion de la tabla que quiere leer 
 CARGA:	LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
@@ -3277,8 +3285,18 @@ CARGA:	LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
 		INCX					;Incrementa X	
 		CBEQX 	#04H,SUMAS
 		JMP 	CARGA			;
-SUMAS:  LDX		#0AH			;
-		JMP *;
+SUMAS:  LDA		M+0				;
+		ADD     M+2				;
+		STA     SUMA+1			;
+		LDA		M+3
+		ADD 	SUMA+1			;
+		STA		SUMA+1			;
+		CLRA					;Limpia a para la suma 
+		ADC		SUMA+0			;
+		STA		SUMA+0			;
+		CLRA					;
+		
+		JMP *					;
 UMULT16:     EQU     *
             PSHA                        ;save acc
             PSHX                        ;save x-reg
@@ -3391,7 +3409,7 @@ SHFTLP: LDA     REMAINDER               ;get remainder MSB
         ROL     REMAINDER+1             ;shift remainder LSB
         ROL     REMAINDER               ;shift remainder MSB
         
-TABLA: FCB 99H,23H,33H,44H
+TABLA: FCB 99H,11H,93H,94H
 ;			Aentero,Adecimal,B,C
 	ORG 0FFFEH;
 	FDB INICIO; A DONDE SE DIRIGE DESPUES DE RESET
