@@ -30,7 +30,7 @@ OPERACIONES:
 CARGA:	LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
 		PSHA					;Se carga dato a la pila								
 		AND 	#0FH			;Se emascara la parte baja del dato
-		STA 	M,X			;Se carga el dato En M+1 Parte mas baja entera			
+		STA 	M,X		    	;Se carga el dato En M+1 Parte mas baja entera			
 		PULA					;Se saca dato de la pila		
 		AND 	#0F0H			;Se emascara la parte alta del dato
 		LSRA					;Se desplaza a la derecha, Cuatro posiciones en total
@@ -46,16 +46,25 @@ CARGA:	LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
 		INCX					;Incrementa X	
 		CBEQX 	#04H,SUMAS
 		JMP 	CARGA			;
-SUMAS:  LDA		M+0				;
-		ADD     M+2				;
-		STA     SUMA+1			;
-		LDA		M+3
-		ADD 	SUMA+1			;
-		STA		SUMA+1			;
-		CLRA					;Limpia a para la suma 
-		ADC		SUMA+0			;
-		STA		SUMA+0			;
-		CLRA					;
+SUMAS:  LDA		M+0				; Se carga en el registro A la parte entera de a  
+		ADD     M+2				; se suma al registro a la parte entera de b
+		STA     SUMA+1		 	; se guarda el contenidp del registro A en suma+1(parte entera baja de s)
+		LDA		M+3             ; Se carga la parte entera de c
+		ADD 	SUMA+1			; se suma el regitsro a con la parte entera de c
+		STA		SUMA+1			; se guarda el contenido de a en suma +1(parte entera baja de s)
+		CLRA					; Limpia a para la suma 
+		ADC		SUMA+0			; se usa la bandera de acarreo si la suma anterior es mayor a 256(parte baja)
+		STA		SUMA+0			; en el registro A queda 0 o 1 dependiendo de la bandera de carry(suma anterior)
+		MOV     M+1,SUMA+2      ; Se carga la parte decimal de a en suma+2 s=a+b+c
+		LSR		SUMA+2			;Desplaza a la derecha SUMA+2 0 -> A(7)
+		LSR		SUMA+1			;SUMA+2(0)->c
+		BCC		ENTERA			;Pregunta si el bit de acarreo esta en 0  
+		LDA		#32H			;Si (c==0) carga a con 50
+		ADD		SUMA+2			;Suma la parte decimal de a con 50
+		STA		SUMA+2			;Cargar la parte decimal con el resultado 
+ENTERA:	BRCLR 	0H,SUMA+0,MULTI;Pregunta SUMA+0(0)==1 (Parte entera alta)
+		BSET	7d,SUMA+1		;Poner el bit 7 de Suma en 1 
+MULTI:	CLRA					;
 		
 		JMP *					;
 UMULT16:     EQU     *
@@ -170,7 +179,7 @@ SHFTLP: LDA     REMAINDER               ;get remainder MSB
         ROL     REMAINDER+1             ;shift remainder LSB
         ROL     REMAINDER               ;shift remainder MSB
         
-TABLA: FCB 99H,11H,93H,94H
+TABLA: FCB 20H,11H,93H,94H
 ;			Aentero,Adecimal,B,C
 	ORG 0FFFEH;
 	FDB INICIO; A DONDE SE DIRIGE DESPUES DE RESET
