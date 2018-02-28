@@ -17,7 +17,7 @@ INICIO: CLRA;Limpia registro A
 		STA SOPT1;Carga registro SOPT1 con ceros para Deshabilitar Modulo COP
 		LDHX #4B0H;Carga #4B0H para reubicar la pila al final de la RAM 
 		TXS; SP = 4AFH o  (HX - 1) -> SP
-		CLR SUMA+0;
+		CLR SUMA+0;LIMPIAR VARIABLES
 		CLR SUMA+1;
 		CLR SUMA+2;
 		CLR AUX;
@@ -62,11 +62,30 @@ SUMAS:  LDA		M+0				; Se carga en el registro A la parte entera de a
 		LDA		#32H			;Si (c==0) carga a con 50
 		ADD		SUMA+2			;Suma la parte decimal de a con 50
 		STA		SUMA+2			;Cargar la parte decimal con el resultado 
-ENTERA:	BRCLR 	0H,SUMA+0,MULTI;Pregunta SUMA+0(0)==1 (Parte entera alta)
+ENTERA:	BRCLR 	0H,SUMA+0,RESTAS;Pregunta SUMA+0(0)==1 (Parte entera alta)
 		BSET	7d,SUMA+1		;Poner el bit 7 de Suma en 1 
-MULTI:	CLRA					;
-		
-		JMP *					;
+RESTAS:	LDA		SUMA+1			;Carga S entero
+		SUB		M+2				;Resta S-B entero
+		STA		M+2				;Guarda S-B entero en m+2
+		LDA		SUMA+1			;Carga S entero
+		SUB		M+3				;Resta S-C entero
+		STA		M+4				;guarda S-C entero en m+4
+		MOV		SUMA+2,M+3      ;Asigna decimal de S a m+3
+		MOV		SUMA+2,M+5		;Asigna decimal de S a m+5		
+		LDA		SUMA+1			;Se carga a para resta
+		SUB		M+0				;Resta S-A entera
+		STA		M+0				;Se carga en M+0 (S-A)entero
+		LDA		SUMA+2			;Carga decimal de s
+		SUB		M+1				;Se resta las partes decimales de s y a (S-A) 
+		BGT		MULTI			;Pregunta A-S>0
+		LDX		M+0				;CARGA EN EL REGISTRO X LA PARTE ENTERA DE S			
+		DECX					;X=X-1 Nuevo calor de MA
+		STX		M+0				;CARGA NUEVO VALOR DE MA(S-A) ENTERO
+		LDA		#64H			;CARGA 100 EN A
+		ADD		SUMA+2			;SUMA 100+S
+		SUB		M+1				;RESTA S+100-A Decimal	
+		STA		M+1				;GUARDA DECIMAL DE S-A
+MULTI:	JMP *					;
 UMULT16:     EQU     *
             PSHA                        ;save acc
             PSHX                        ;save x-reg
@@ -179,7 +198,7 @@ SHFTLP: LDA     REMAINDER               ;get remainder MSB
         ROL     REMAINDER+1             ;shift remainder LSB
         ROL     REMAINDER               ;shift remainder MSB
         
-TABLA: FCB 20H,11H,93H,94H
+TABLA: FCB 2H,10H,21H,9H
 ;			Aentero,Adecimal,B,C
 	ORG 0FFFEH;
 	FDB INICIO; A DONDE SE DIRIGE DESPUES DE RESET
