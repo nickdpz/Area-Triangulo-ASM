@@ -6,7 +6,7 @@
 ;Dos byte mas significativos parte entera y el menos significativo parte decimal
 INTACC1     DS    4            ;32-bit integer accumulator #1
 INTACC2     DS    4  
-AUX			DS 5
+AUX			DS 1
 M 			DS 6
 SUMA		DS 3
 CONTADOR DS 1
@@ -25,6 +25,14 @@ INICIO: CLRA;Limpia registro A
 		CLR AUX+2;
 		CLR AUX+3;
 		CLR AUX+4;
+		CLR INTACC1+0;
+		CLR	INTACC1+1;
+		CLR INTACC1+2;
+		CLR	INTACC1+3;
+		CLR INTACC2+0;
+		CLR	INTACC2+1;
+		CLR INTACC1+2;
+		CLR	INTACC1+3;
 OPERACIONES:
 		LDHX	#0H				;Se le asigna la posicion de la tabla que quiere leer 
 CARGA:	LDA		TABLA,	X		;Se accede a la tabla direccionando en la posicion x
@@ -76,7 +84,8 @@ RESTAS:	LDA		SUMA+1			;Carga S entero
 		SUB		M+0				;Resta S-A entera
 		STA		M+0				;Se carga en M+0 (S-A)entero
 		LDA		SUMA+2			;Carga decimal de s
-		SUB		M+1				;Se resta las partes decimales de s y a (S-A) 
+		SUB		M+1				;Se resta las partes decimales de s y a (S-A)
+		CLR		,X 
 		BGT		MULTI			;Pregunta A-S>0
 		LDX		M+0				;CARGA EN EL REGISTRO X LA PARTE ENTERA DE S			
 		DECX					;X=X-1 Nuevo calor de MA
@@ -85,7 +94,14 @@ RESTAS:	LDA		SUMA+1			;Carga S entero
 		ADD		SUMA+2			;SUMA 100+S
 		SUB		M+1				;RESTA S+100-A Decimal	
 		STA		M+1				;GUARDA DECIMAL DE S-A
-MULTI:	JMP *					;
+		CLR     ,X				;
+MULTI:	MOV		SUMA+1,INTACC1+1;
+		LDA		M,SP
+		STA		INTACC2+1		;
+		JSR		UMULT16			;
+		JMP *					;
+
+
 UMULT16:     EQU     *
             PSHA                        ;save acc
             PSHX                        ;save x-reg
@@ -198,7 +214,7 @@ SHFTLP: LDA     REMAINDER               ;get remainder MSB
         ROL     REMAINDER+1             ;shift remainder LSB
         ROL     REMAINDER               ;shift remainder MSB
         
-TABLA: FCB 2H,10H,21H,9H
+TABLA: FCB 9H,80H,17H,15H
 ;			Aentero,Adecimal,B,C
 	ORG 0FFFEH;
 	FDB INICIO; A DONDE SE DIRIGE DESPUES DE RESET
