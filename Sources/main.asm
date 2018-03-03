@@ -83,9 +83,9 @@ RESTAS:	LDA		SUMA+1			;Carga S entero
 		LDA		SUMA+1			;Se carga a para resta
 		SUB		M+0				;Resta S-A entera
 		STA		M+0				;Se carga en M+0 (S-A)entero
+		CLRX					;SE LIMPIA
 		LDA		SUMA+2			;Carga decimal de s
-		SUB		M+1				;Se resta las partes decimales de s y a (S-A)
-		CLR		,X 
+		SUB		M+1				;Se resta las partes decimales de s y a (S-A) 
 		BGT		MULTI			;Pregunta A-S>0
 		LDX		M+0				;CARGA EN EL REGISTRO X LA PARTE ENTERA DE S			
 		DECX					;X=X-1 Nuevo calor de MA
@@ -94,11 +94,13 @@ RESTAS:	LDA		SUMA+1			;Carga S entero
 		ADD		SUMA+2			;SUMA 100+S
 		SUB		M+1				;RESTA S+100-A Decimal	
 		STA		M+1				;GUARDA DECIMAL DE S-A
-		CLR     ,X				;
+		CLRX					;LIMPIA X PARA DIRECIONAMIENTO
 MULTI:	MOV		SUMA+1,INTACC1+1;
-		LDA		M,SP
+		LDA		M,X				;
 		STA		INTACC2+1		;
 		JSR		UMULT16			;
+		MOV		INTACC1+0,SUMA+0;
+		MOV		INTACC1+3,SUMA+1;
 		JMP *					;
 
 
