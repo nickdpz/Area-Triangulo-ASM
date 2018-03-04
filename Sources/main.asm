@@ -85,14 +85,14 @@ RESTAS:	LDA		SUMA+1			;Carga S entero
 		STA		M+0				;Se carga en M+0 (S-A)entero
 		CLRX					;SE LIMPIA
 		LDA		SUMA+2			;Carga decimal de s
-		SUB		M+1				;Se resta las partes decimales de s y a (S-A) 
+		SUB		M+1				;Se resta las partes decimales de s y a (S-A)
+		STA		M+1				;GUARDA DECIMAL DE S-A
 		BGT		MULTI			;Pregunta A-S>0
 		LDX		M+0				;CARGA EN EL REGISTRO X LA PARTE ENTERA DE S			
 		DECX					;X=X-1 Nuevo calor de MA
 		STX		M+0				;CARGA NUEVO VALOR DE MA(S-A) ENTERO
 		LDA		#64H			;CARGA 100 EN A
-		ADD		SUMA+2			;SUMA 100+S
-		SUB		M+1				;RESTA S+100-A Decimal	
+		ADD		M+1				;RESTA S+100-A Decimal	
 		STA		M+1				;GUARDA DECIMAL DE S-A
 		CLRX					;LIMPIA X PARA DIRECIONAMIENTO
 MULTI:	MOV		SUMA+1,INTACC1+1;
@@ -216,7 +216,7 @@ SHFTLP: LDA     REMAINDER               ;get remainder MSB
         ROL     REMAINDER+1             ;shift remainder LSB
         ROL     REMAINDER               ;shift remainder MSB
         
-TABLA: FCB 9H,80H,17H,15H
+TABLA: FCB 9H,80H,17H,16H
 ;			Aentero,Adecimal,B,C
 	ORG 0FFFEH;
 	FDB INICIO; A DONDE SE DIRIGE DESPUES DE RESET
