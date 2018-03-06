@@ -3618,20 +3618,74 @@ SUM_D_23:PULA
 		PULX
 		CLRX					;
 		PSHA
-		LDA   M+3
-		ADD   #1H				;SUMA MAS 1 En todos los casos PARTE ENTERA
-		STA   M+3				;
+		LDA   	M+3
+		ADD   	#1H				;SUMA MAS 1 En todos los casos PARTE ENTERA
+		STA   	M+3				;
 		CLRA					;
-		ADC   M+2				;
-		STA   M+2				;
+		ADC   	M+2				;
+		STA  	M+2				;
 		CLRA					;
-		ADC   M+1				;
-		STA   M+1
+		ADC   	M+1				;
+		STA   	M+1
 		CLRA
-		ADC   M+0
-		STA   M+0
+		ADC   	M+0
+		STA   	M+0
 MUL_23:	PULA 
-		STA   M+4				;SE GUARDA LA PARTE DECIMAL FINAL		
+		STA   	M+4				;SE GUARDA LA PARTE DECIMAL FINAL
+		LDX     #6H
+CORR:  	LSL	  	M+3             ;SE DESPLAZA PRIMER BYTE
+		CLRA	                ;
+		ADC		#0              ;SE OBTIENE EL PRIMER CARRY
+		PSHA                    ;SE GUARDA EL PRIMER CARRY EN LA PILA
+		
+		LSL	  	M+2             ;SE DESPLAZA SEGUNDO BYTE
+		ADC		#0              ;SE OBTIENE EL SEGUNDO CARRY
+		PULH
+		PSHA           			;SE  GUARDA EL SEGUNDO CARRY EN AUX+0
+		PSHH					;
+		PULA					;		
+		ADD		M+2             ;SE SUMA AL SEGUNDO BYTE EL PRIMER CARRY           
+		STA		M+2             ;SE GUARDA					
+		
+		LSL		M+1
+		ADC		#0              ;SE OBTIENE EL 
+		PULH					;
+		PSHA					;
+		PSHH					;
+		PULA					;
+		ADD		M+1				;
+		STA     M+1				;
+		
+		LSL	  	M+0				;
+		PULA					;
+		ADD		M+0				;
+		STA		M+0				;
+		DBNZX   CORR; Pregunta si x es igual a cero si es diferente salta y decrementa
+
+				
+		
+		
+		MOV   M+0,INTACC1+0    ; ASIGNA PARTE ALTA DEL NUMERADOR ENTERO
+		MOV   M+1,INTACC1+1    ; ""
+		MOV   M+2,INTACC1+2    ; "" 
+		MOV   M+3,INTACC1+3    ; ASIGNA PARTE BAJA DEL NUEMRADOR ENTERO 
+		
+		MOV  #0H,INTACC2
+		LDX  #64H
+		MOV  #64,INTACC2+1
+		
+		
+RAIZ:   MOV   M+0,INTACC1+0    ; ASIGNA PARTE ALTA DEL NUMERADOR ENTERO
+		MOV   M+1,INTACC1+1    ; ""
+		MOV   M+2,INTACC1+2    ; "" 
+		MOV   M+3,INTACC1+3    ; ASIGNA PARTE BAJA DEL NUEMRADOR ENTERO 
+		JSR   UDVD32           ; DIVIDE SOBRE X
+		MOV   INTACC1+0,AUX+0  ; CARGA PARTE ALTA COCIENTE DE DIVISION ENTERO 
+		MOV   INTACC1+1,AUX+1  ; ""
+		MOV   INTACC1+2,AUX+2  ; ""
+		MOV   INTACC1+3,AUX+3  ; CARGA PARTE BAJA COCIENTE DE DIVISION ENTERO
+		MOV   INTACC2+1,AUX+4  ; CARGA PARTE BAJA DE RESIDUO
+        			
 		JMP *		
 
 
