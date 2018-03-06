@@ -1,0 +1,51 @@
+SUMA+1--> Entero de S
+M+0 -- > Entero (S-A)
+M+2 -- > Entero (S-B)
+M+4 -- > Entero(S-C)
+----------------------------------
+SUMA+2--> Decimal de S
+M+1 -- > Decimal (S-A)
+M+3 -- > Decimal (S-B)
+M+5 -- > Decimal (S-C)
+----------------------------------
+AUX+0 -- > PARTE ALTA DE Se*SAe
+AUX+1 -- > PARTE BAJA DE Se*SAe
+AUX+2 -- > ENTERA  DE Se*SAd 
+AUX+3 -- > DECIMAL DE Se*SAd
+AUX+4 -- > ENTERA  DE Sd*SAe
+AUX+5 -- > DECIMAL DE Sd*SAe
+AUX+6 -- > DECIMAL DE Sd*SAd 
+
+M1
+SUMA+0 -- > PARTE ALTA SUMA ENTEROS M1
+SUMA+1 -- > PARTE BAJA SUMA ENTEROS M1
+SUMA+2 -- > DECIMAL M1
+M2
+AUX+0 -- > PARTE ALTA SUMA ENTEROS M2
+AUX+1 -- > PARTE BAJA SUMA ENTEROS M2
+AUX+2 -- > DECIMAL M2
+----------------------------------------------------------------
+M+0  -- > PARTE ALTA DE ENTERO * ENTERO
+""
+M+3  -- > PARTE BAJA DE ENTERO * ENTERO
+
+M+4   -- > DECIMAL DE ENTERO*DECIMAL
+
+AUX+3 -- > COCIENTE  PARTE ALTA DE DIVISION ENTERO*DECIMAL
+""
+AUX+6 -- > COCIENTE PARTE BAJA DE DIVIDION ENTERO*DECIMAL 
+
+M+5   -- > DECIMAL DE DECIMAL*ENTERO
+
+AUX+7 -- > COCIENTE  PARTE ALTA DE DIVISION DECIMAL*ENTERO
+""
+AUX+10 -- > COCIENTE PARTE BAJA DE DIVIDION DECIMAL*ENTERO
+
+M+6 -- > DECIMAL DECIMAL*DECIMAL
+------------------------------------------------------------
+ENTERO ENTERO
+M+0  -- > PARTE ALTA DE ENTERO * ENTERO
+""
+M+3  -- > PARTE BAJA DE ENTERO * ENTERO
+
+M+4 --> PARTE DECIMAL
